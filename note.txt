@@ -1,0 +1,25 @@
+Backend command
+  npm init -y
+  npm i express
+  npm i nodemon -D
+
+
+#package.json
+ "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  }
+
+  npm i dotenv
+  npm i mongoose
+  npm i bcryptjs  //Password  decryption 
+  npm i jsonwebtoken //Json tokan
+  npm i nodemailer //nodemailer - mail configication
+
+  ----------------------------------------------
+
+  Model        -> Database design 
+  View         -> web page response 
+  Controller   -> frontend to Backend
