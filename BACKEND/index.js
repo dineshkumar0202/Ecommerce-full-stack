@@ -1,6 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from './Database/db.js';
+import connectDB from './database/db.js';
+
+// import routs
+import userRoutes from './routes/user.js';
+
 
 const app = express();
 dotenv.config();
@@ -9,9 +13,7 @@ const port = process.env.PORT;
 // middle wares
 app.use(express.json());
 
-// import routs
-import userRoutes from './routes/user.js';
-import { User } from "./models/User.js";
+
 
 // using routes
 app.use('/api/', userRoutes);
