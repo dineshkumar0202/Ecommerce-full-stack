@@ -6,6 +6,15 @@ const app = express();
 dotenv.config();
 const port = process.env.PORT;
 
+// middle wares
+app.use(express.json());
+
+// import routs
+import userRoutes from './routes/user.js';
+import { User } from "./models/User.js";
+
+// using routes
+app.use('/api/', userRoutes);
 
 
 app.get('/', (req,res) => {

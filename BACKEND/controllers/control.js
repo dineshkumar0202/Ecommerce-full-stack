@@ -5,7 +5,9 @@ import sendMail from '../middleware/sendMail.js';
 
 export const registerUser = async (req,res) =>{
     try{
+        console.log(req.body);
         const {name, email, password, contact} = req.body;
+
 
         // code to be email already exists
         let user= await User.findOne({email});
@@ -31,7 +33,6 @@ export const registerUser = async (req,res) =>{
             message:"OTP send to your mail",
             activationTokan,   
         })
-
 
     }catch(error){
         res.status(500).json({
