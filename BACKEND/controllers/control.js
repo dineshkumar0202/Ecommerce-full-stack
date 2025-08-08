@@ -29,19 +29,19 @@ export const registerUser = async (req, res) => {
     const activationToken = jwt.sign(
       { user, otp },
       process.env.ACTIVATION_SECRET,
-      { expiresIn: "5m" }
+      { expiresIn: "10m" }
     );
 
     // Send Email to use
-    const emailText = `Please Verify your account using OTP. Your OTP is ${otp}`;
-    await sendMail(email, "Welcome to E-COMMERCE", emailText);
+    const message = `Please Verify your account using OTP. Your OTP is ${otp}`;
+    await sendMail(email, "Welcome to E-COMMERCE", message);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "OTP Sent to your mail",
       activationToken,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
@@ -50,32 +50,106 @@ export const registerUser = async (req, res) => {
 // Verify OTP
 export const VerifyUser = async (req, res) => {
   try {
-    const {otp,activationToken} = req.body;
-    const verify=jwt.verify(activationToken,process.env.ACTIVATION_SECRET)
-    if(!verify){
+    const { otp, activationToken } = req.body;
+
+    let verify;
+    try {
+      verify = jwt.verify(activationToken, process.env.ACTIVATION_SECRET);
+    } catch (jwtError) {
+      if (jwtError.name === "TokenExpiredError") {
+        return res.json({
+          message: "OTP Expired",
+        });
+      }
       return res.json({
-        message:"OTP Expired Resend OTP",
-    });
+        message: "Invalid Token",
+      });
     }
-    if(verify.otp !== otp){
+
+    if (!verify) {
       return res.json({
-        message:"Worng OTP Try Again",
-    });
+        message: "OTP Expired",
+      });
+    }
+
+    // Convert both to numbers for comparison
+    const tokenOtp = parseInt(verify.otp);
+    const userOtp = parseInt(otp);
+
+    if (tokenOtp !== userOtp) {
+      return res.json({
+        message: "Wrong OTP Try Again",
+      });
     }
 
     await User.create({
-      name:verify.user.name,
-      email:verify.user.email,
-      hashPassword:verify.user.hashPassword,
-      contact:verify.user.contact,
+      name: verify.user.name,
+      email: verify.user.email,
+      password: verify.user.hashPassword,
+      contact: verify.user.contact,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Registration Successfully",
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: error.message,
     });
   }
 };
+
+// Login user
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // check user email id
+    const user = await User.findOne({ email });   
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid Email ? ",
+      });
+    }
+    // check password
+    const matchPassword = await bcrypt.compare(password, user.password);
+    if (!matchPassword) {
+      return res.status(400).json({
+        message: "Invalid Password ?",
+      });
+    }
+    // Generate signed token
+    const token = jwt.sign({ _id: user.id }, process.env.JWT_SECRET, {expiresIn:"15d"});
+
+    // exclude the password feild befor sending the response
+     const  {password:userPassword, ...userdetails} = user.toObject();
+
+    return res.status(200).json({
+      message: "Welcome"  +  user.name,
+      token,
+      user :userdetails,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+
+// User Profile
+
+export const myProfile = async (req,res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    return res.status(200).json({
+      user,
+    });
+  } catch (error) {
+
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+}
