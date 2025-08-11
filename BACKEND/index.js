@@ -4,6 +4,7 @@ import connectDB from './database/db.js';
 
 // import routs
 import userRoutes from './routes/user.js';
+import productRoutes from './routes/routeProduct.js';
 
 
 const app = express();
@@ -17,6 +18,8 @@ app.use(express.json());
 
 // using routes
 app.use('/api/', userRoutes);
+app.use('/api/', productRoutes);
+
 
 
 app.get('/', (req,res) => {
