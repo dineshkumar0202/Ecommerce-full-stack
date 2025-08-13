@@ -14,6 +14,8 @@ const port = process.env.PORT;
 // middle wares
 app.use(express.json());
 
+// static files
+app.use("./uploads",express.static("uploads"));
 
 
 // using routes

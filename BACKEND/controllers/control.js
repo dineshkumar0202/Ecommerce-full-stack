@@ -105,7 +105,7 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     // check user email id
-    const user = await User.findOne({ email });   
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
         message: "Invalid Email ? ",
@@ -119,37 +119,37 @@ export const loginUser = async (req, res) => {
       });
     }
     // Generate signed token
-    const token = jwt.sign({ _id: user.id }, process.env.JWT_SECRET, {expiresIn:"15d"});
-
-    // exclude the password feild befor sending the response
-     const  {password:userPassword, ...userdetails} = user.toObject();
-
-    return res.status(200).json({
-      message: "Welcome"  +  user.name,
-      token,
-      user :userdetails,
+    const token = jwt.sign({ _id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "15d",
     });
 
+    // exclude the password feild befor sending the response
+    const { password: userPassword, ...userdetails } = user.toObject();
+
+    return res.status(200).json({
+      message: "Welcome" + user.name,
+      token,
+      user: userdetails,
+    });
   } catch (error) {
+    // console.log("hii");
     return res.status(500).json({
       message: error.message,
     });
   }
 };
 
-
 // User Profile
 
-export const myProfile = async (req,res) => {
+export const myProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     return res.status(200).json({
       user,
     });
   } catch (error) {
-
     return res.status(500).json({
       message: error.message,
     });
   }
-}
+};
