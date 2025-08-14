@@ -17,6 +17,10 @@ Backend command
   npm i bcryptjs  //Password  decryption 
   npm i jsonwebtoken //Json tokan
   npm i nodemailer //nodemailer - mail configication
+  {
+  npm i multer 
+  npm i uuid // create a unic id 
+  }
 
   ----------------------------------------------
 
